@@ -1,7 +1,7 @@
-const htmlparser = require("htmlparser");
+const himalaya = require("himalaya");
 
 const compile = (component, options) => {
-  const tree = htmlparser(component);
+  const tree = himalaya.parse(component);
 }
 
 module.exports = compile;
