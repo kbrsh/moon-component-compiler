@@ -24,7 +24,9 @@ const compile = (name, component, options) => {
   let template = undefined;
   let templateRoot = undefined;
   let style = undefined;
+  let styleRoot = undefined;
   let script = undefined;
+  let scriptRoot = undefined;
 
   for(let i = 0; i < tree.length; i++) {
     const node = tree[i];
@@ -44,8 +46,10 @@ const compile = (name, component, options) => {
         }
       } else if(tagName === "style" && style === undefined) {
         style = node;
+        styleRoot = compileLanguage(style.children[0].content, style.attributes.lang);
       } else if(tagName === "script" && script === undefined) {
         script = node;
+        scriptRoot = compileLanguage(script.children[0].content, script.attributes.lang);
       }
     }
   }
@@ -55,17 +59,16 @@ const compile = (name, component, options) => {
 
   if(cached === undefined) {
     cache[name] = {
-      template: template,
-      style: style,
-      script: script
+      styleRoot: styleRoot,
+      scriptRoot: scriptRoot
     }
-  } else if(development === true && cached.style === style && cached.script === script) {
+  } else if(development === true && cached.styleRoot === styleRoot && cached.scriptRoot === scriptRoot) {
     render = "true";
   }
 
   if(style !== undefined) {
     const scoped = style.attributes.scoped === "scoped";
-    style = compileLanguage(style.children[0].content, style.attributes.lang);
+    style = styleRoot;
 
     if(scoped === true) {
       const scopeID = `m-scope-${id(name)}`;
@@ -81,7 +84,7 @@ const compile = (name, component, options) => {
   }
 
   if(script !== undefined) {
-    output += `options = (function(exports) {${compileLanguage(script.children[0].content, script.attributes.lang)} return exports;})({});\n`;
+    output += `options = (function(exports) {${scriptRoot} return exports;})({});\n`;
   }
 
   if(template !== undefined && templateRoot !== undefined) {
