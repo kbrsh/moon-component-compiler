@@ -1,6 +1,7 @@
 const Moon = require("moonjs");
 const himalaya = require("himalaya");
 const toHTML = require("himalaya/translate").toHTML;
+const newlineRE = /\n/g;
 const selectorRE = /([\#\.\w\-\,\s\n\r\t:]+?)\s*(?=\s*\{)/g;
 
 const id = require('./src/id.js');
@@ -10,6 +11,9 @@ const compileLanguage = require('./src/compile.js');
 const compile = (name, component, options) => {
   // Parsed HTML Tree
   const tree = himalaya.parse(component);
+
+  // Check for development
+  const development = options.development;
 
   // Component Output
   let output = `var options = {};\n`;
@@ -34,10 +38,6 @@ const compile = (name, component, options) => {
     }
   }
 
-  if(script !== undefined) {
-    output += `options = (function(exports) {${compileLanguage(script.children[0].content, script.attributes.lang)} return exports;})({});\n`;
-  }
-
   if(style !== undefined) {
     const scoped = style.attributes.scoped === "scoped";
     style = compileLanguage(style.children[0].content, style.attributes.lang);
@@ -51,13 +51,21 @@ const compile = (name, component, options) => {
         template.children[0].content = toHTML(parsedTemplateChildren[0]);
       }
     }
+
+    if(development === true) {
+      output += `var injectStyle = require('moon-component-compiler/injectStyle'); injectStyle("${style.replace(newlineRE, "")}");\n`;
+    }
+  }
+
+  if(script !== undefined) {
+    output += `options = (function(exports) {${compileLanguage(script.children[0].content, script.attributes.lang)} return exports;})({});\n`;
   }
 
   if(template !== undefined) {
     output += `options.render = ${Moon.compile(compileLanguage(toHTML(template.children[0]), template.attributes.lang)).toString().replace("function anonymous(h\n/**/)", "function(h)")}\n`;
   }
 
-  if(options.hotReload === true) {
+  if(development === true) {
     output += `var hotReload = require("moon-hot-reload"); if(module.hot) {module.hot.accept(); hotReload.reload("${name}");}; module.exports = function(Moon) {hotReload.init("${name}", Moon.component("${name}", options));};`;
   } else {
     output += `module.exports = function(Moon) {Moon.component("${name}", options);};`;
