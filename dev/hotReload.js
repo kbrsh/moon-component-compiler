@@ -11,10 +11,10 @@ module.exports.init = function(name, CTor) {
     instances: []
   }
 
-  var init = CTor.init;
-  CTor.init = function() {
+  var init = CTor.prototype.init;
+  CTor.prototype.init = function() {
     map[name].instances.push(this);
-    init.call(instance);
+    init.call(this);
   }
 }
 
