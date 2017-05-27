@@ -35,7 +35,7 @@ To compile a single file component (a `.moon file`), you can do:
 
 ```js
 const compile = require("moon-component-compiler");
-const compiled = compile(component, {
+const compiled = compile("Head", component, {
   hotReload: true
 });
 ```
