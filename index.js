@@ -20,6 +20,7 @@ const compile = (name, component, options) => {
 
   // Extract Items
   let template = undefined;
+  let templateRoot = undefined;
   let style = undefined;
   let script = undefined;
 
@@ -30,6 +31,17 @@ const compile = (name, component, options) => {
       const tagName = node.tagName;
       if(tagName === "template" && template === undefined) {
         template = node;
+
+        node = himalaya.parse(node.children[0].content);
+
+        const children = node.children;
+        for(let i = 0; i < children.length; i++) {
+          const child = children[i];
+          if(child.type === "Element") {
+            templateRoot = child;
+            break;
+          }
+        }
       } else if(tagName === "style" && style === undefined) {
         style = node;
       } else if(tagName === "script" && script === undefined) {
@@ -46,9 +58,7 @@ const compile = (name, component, options) => {
       const scopeID = `m-scope-${id(name)}`;
       style = style.replace(selectorRE, `$1.${scopeID}`);
       if(template !== undefined) {
-        const parsedTemplateChildren = himalaya.parse(template.children[0].content);
-        addClass(parsedTemplateChildren[0], scopeID);
-        template.children[0].content = toHTML(parsedTemplateChildren[0]);
+        addClass(templateRoot, scopeID);
       }
     }
 
@@ -61,8 +71,8 @@ const compile = (name, component, options) => {
     output += `options = (function(exports) {${compileLanguage(script.children[0].content, script.attributes.lang)} return exports;})({});\n`;
   }
 
-  if(template !== undefined) {
-    output += `options.render = ${Moon.compile(compileLanguage(toHTML(template.children[0]), template.attributes.lang)).toString().replace("function anonymous(h\n/**/)", "function(h)")}\n`;
+  if(template !== undefined && templateRoot !== undefined) {
+    output += `options.render = ${Moon.compile(compileLanguage(toHTML(templateRoot), template.attributes.lang)).toString().replace("function anonymous(h\n/**/)", "function(h)")}\n`;
   }
 
   if(development === true) {
