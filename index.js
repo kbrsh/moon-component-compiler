@@ -8,6 +8,8 @@ const compileLanguage = require('./src/compile.js');
 
 const selectorRE = /([\#\.\w\-\,\s\n\r\t:]+?)\s*(?=\s*\{)/g;
 
+let cache = {};
+
 const compile = (name, component, options) => {
   // Parsed HTML Tree
   const tree = himalaya.parse(component);
@@ -48,6 +50,19 @@ const compile = (name, component, options) => {
     }
   }
 
+  let cached = cache[name];
+  let render = "false";
+
+  if(cached === undefined) {
+    cache[name] = {
+      template: template,
+      style: style,
+      script: script
+    }
+  } else if(development === true && cached.style === style && cached.script === script) {
+    render = "true";
+  }
+
   if(style !== undefined) {
     const scoped = style.attributes.scoped === "scoped";
     style = compileLanguage(style.children[0].content, style.attributes.lang);
@@ -78,7 +93,7 @@ const compile = (name, component, options) => {
     if(style !== undefined) {
       output += `module.hot.dispose(removeStyle); `;
     }
-    output += `if(module.hot.data) {hotReload.reload("${name}", options);};};\n`;
+    output += `if(module.hot.data) {hotReload.reload("${name}", options, ${render});};};\n`;
     output += `module.exports = function(Moon) {hotReload.init(Moon, "${name}", options);};`;
   } else {
     output += `module.exports = function(Moon) {Moon.component("${name}", options);};`;

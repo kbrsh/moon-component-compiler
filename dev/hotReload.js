@@ -24,15 +24,54 @@ module.exports.init = function(Moon, name, options) {
   }
 }
 
-module.exports.reload = function(name, options) {
-  var Moon = window.MOON_HOT_RELOAD;
-
+module.exports.reload = function(name, options, render) {
   var item = map[name];
   var instances = item.instances;
 
-  item.CTor.prototype = Moon.component(name, options).prototype;
+  if(render === true) {
+    item.CTor = Moon.component(name, options);
 
-  for(var i = 0; i < instances.length; i++) {
-    instances[i].build();
+    var render = options.render;
+    for(var i = 0; i < instances.length; i++) {
+      var instance = instances[i];
+      instance.$render = render;
+      instance.build();
+    }
+  } else {
+    var Moon = window.MOON_HOT_RELOAD;
+
+    var oldCTor = item.CTor;
+    var newCTor = Moon.component(name, options);
+    var el = null;
+
+    item.CTor = newCTor;
+
+    for(var i = 0; i < instances.length; i++) {
+      var instance = instances[i];
+
+      el = instance.$el;
+      delete el.__moon__;
+    }
+
+    while(el.__moon__ === undefined || el.__moon__ === instance) {
+      el = el.parentNode;
+    }
+
+    var rootInstance = el.__moon__;
+    var dom = [rootInstance.$dom];
+
+    while(dom.length !== 0) {
+      var vnode = dom.pop();
+      if(vnode.meta.component !== undefined && vnode.meta.component.CTor === oldCTor) {
+        var componentInfo = vnode.meta.component;
+        componentInfo.CTor = newCTor;
+        componentInfo.options = options;
+        dom = [];
+      } else if(vnode.children.length !== 0) {
+        dom = dom.concat(vnode.children);
+      }
+    }
+
+    rootInstance.build();
   }
 }
