@@ -25,7 +25,7 @@ const compile = (name, component, options) => {
   let script = undefined;
 
   for(let i = 0; i < tree.length; i++) {
-    const node = tree[i];
+    let node = tree[i];
 
     if(node.type === "Element") {
       const tagName = node.tagName;
