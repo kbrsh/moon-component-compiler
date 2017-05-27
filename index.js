@@ -1,6 +1,17 @@
 const Moon = require("moonjs");
 const himalaya = require("himalaya");
 const toHTML = require("himalaya/translate").toHTML;
+const selectorRE = /([\#\.\w\-\,\s\n\r\t:]+?)\s*(?=\s*\{)/g;
+
+const id = (name) => {
+  name = name.split('').map((char) => {
+    return char.charCodeAt(0);
+  });
+  name = name.reduce(function(prev, curr){
+    return ((prev << 5) + prev) + curr;
+  }, 5381);
+  return name.toString(36);
+}
 
 const compile = (name, component, options) => {
   // Parsed HTML Tree
@@ -25,15 +36,9 @@ const compile = (name, component, options) => {
           template = toHTML(node.children[0]);
         }
       } else if(tagName === "style" && style === undefined) {
-        const children = node.children;
-        if(children.length !== 0) {
-          style = toHTML(node.children[0]);
-        }
+        style = node;
       } else if(tagName === "script" && script === undefined) {
-        const children = node.children;
-        if(children.length !== 0) {
-          script = toHTML(node.children[0]);
-        }
+        script = node;
       }
     }
   }
@@ -47,7 +52,13 @@ const compile = (name, component, options) => {
   }
 
   if(style !== undefined) {
-    output +=
+    const scoped = style.attributes.scoped === "scoped";
+    const lang = style.attributes.lang;
+    style = style.children[0].content;
+
+    if(scoped === true) {
+      style = style.replace(selectorRE, `$1.${id(name)}`);
+    }
   }
 
   if(options.hotReload === true) {
@@ -61,7 +72,6 @@ const compile = (name, component, options) => {
     style: style
   }
 }
-
 
 
 module.exports = compile;
