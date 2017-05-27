@@ -51,7 +51,7 @@ const compile = (name, component, options) => {
   }
 
   if(options.hotReload === true) {
-    output += `module.exports = function`;
+    output += `var hotReload = require("moon-hot-reload"); if(module.hot) {module.hot.accept(); hotReload.reload("${name}");}; module.exports = function(Moon) {hotReload.init("${name}", Moon.component("${name}", options));};`;
   } else {
     output += `module.exports = function(Moon) {Moon.component("${name}", options);};`;
   }
@@ -61,7 +61,5 @@ const compile = (name, component, options) => {
     style: style
   }
 }
-
-
 
 module.exports = compile;
