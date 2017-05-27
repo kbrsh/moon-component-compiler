@@ -67,11 +67,11 @@ const compile = (name, component, options) => {
 
   if(development === true) {
     output += `var hotReload = require("moon-component-compiler/dev/hotReload");\n`;
-    output += `hotReload.reload("${name}");}; module.exports = function(Moon) {var instance = Moon.component("${name}", options); if(module.hot) {module.hot.accept(); `;
+    output += `module.exports = function(Moon) {var instance = Moon.component("${name}", options); if(module.hot) {module.hot.accept(); `;
     if(style !== undefined) {
       output += `module.hot.dispose(removeStyle); `;
     }
-    output += `if(module.hot.data) {hotReload.reload("${name}", instance)} else {hotReload.init("${name}", instance)};};};`;
+    output += `if(module.hot.data) {hotReload.reload("${name}", instance);} else {hotReload.init("${name}", instance)};};};`;
   } else {
     output += `module.exports = function(Moon) {Moon.component("${name}", options);};`;
   }
