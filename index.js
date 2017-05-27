@@ -3,15 +3,8 @@ const himalaya = require("himalaya");
 const toHTML = require("himalaya/translate").toHTML;
 const selectorRE = /([\#\.\w\-\,\s\n\r\t:]+?)\s*(?=\s*\{)/g;
 
-const id = (name) => {
-  name = name.split('').map((char) => {
-    return char.charCodeAt(0);
-  });
-  name = name.reduce(function(prev, curr){
-    return ((prev << 5) + prev) + curr;
-  }, 5381);
-  return name.toString(36);
-}
+const id = require('./src/id.js');
+const compileLanguage = require('./src/compile.js');
 
 const compile = (name, component, options) => {
   // Parsed HTML Tree
@@ -31,10 +24,7 @@ const compile = (name, component, options) => {
     if(node.type === "Element") {
       const tagName = node.tagName;
       if(tagName === "template" && template === undefined) {
-        const children = node.children;
-        if(children.length !== 0) {
-          template = toHTML(node.children[0]);
-        }
+        template = node;
       } else if(tagName === "style" && style === undefined) {
         style = node;
       } else if(tagName === "script" && script === undefined) {
@@ -44,17 +34,16 @@ const compile = (name, component, options) => {
   }
 
   if(script !== undefined) {
-    output += `options = (function(exports) {${script} return exports;})({});\n`;
+    output += `options = (function(exports) {${compileLanguage(script.children[0].content, script.attributes.lang)} return exports;})({});\n`;
   }
 
   if(template !== undefined) {
-    output += `options.render = ${Moon.compile(template).toString().replace("function anonymous(h\n/**/)", "function(h)")}\n`;
+    output += `options.render = ${Moon.compile(compileLanguage(template.children[0].content, template.attributes.lang)).toString().replace("function anonymous(h\n/**/)", "function(h)")}\n`;
   }
 
   if(style !== undefined) {
     const scoped = style.attributes.scoped === "scoped";
-    const lang = style.attributes.lang;
-    style = style.children[0].content;
+    style = compileLanguage(style.children[0].content, style.attributes.lang);
 
     if(scoped === true) {
       style = style.replace(selectorRE, `$1.${id(name)}`);
@@ -72,6 +61,5 @@ const compile = (name, component, options) => {
     style: style
   }
 }
-
 
 module.exports = compile;
