@@ -11,7 +11,7 @@ const compile = (name, component, options) => {
   const tree = himalaya.parse(component);
 
   // Component Output
-  let output = `var Moon = require("moonjs");var options = {};\n`;
+  let output = `var options = {};\n`;
 
   // Extract Items
   let template = undefined;
@@ -51,9 +51,9 @@ const compile = (name, component, options) => {
   }
 
   if(options.hotReload === true) {
-    output += `module.exports = `;
+    output += `module.exports = function`;
   } else {
-    output += `module.exports = Moon.component("${name}", options);`;
+    output += `module.exports = function(Moon) {Moon.component("${name}", options);};`;
   }
 
   return {
@@ -61,5 +61,7 @@ const compile = (name, component, options) => {
     style: style
   }
 }
+
+
 
 module.exports = compile;
