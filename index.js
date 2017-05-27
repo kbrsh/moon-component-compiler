@@ -1,12 +1,12 @@
 const Moon = require("moonjs");
 const himalaya = require("himalaya");
 const toHTML = require("himalaya/translate").toHTML;
-const newlineRE = /\n/g;
-const selectorRE = /([\#\.\w\-\,\s\n\r\t:]+?)\s*(?=\s*\{)/g;
 
 const id = require('./src/id.js');
 const addClass = require('./src/addClass.js');
 const compileLanguage = require('./src/compile.js');
+
+const selectorRE = /([\#\.\w\-\,\s\n\r\t:]+?)\s*(?=\s*\{)/g;
 
 const compile = (name, component, options) => {
   // Parsed HTML Tree
@@ -61,7 +61,7 @@ const compile = (name, component, options) => {
     }
 
     if(development === true) {
-      output += `var injectStyle = require('moon-component-compiler/dev/injectStyle'); var removeStyle = injectStyle("${style.replace(newlineRE, "")}");\n`;
+      output += `var injectStyle = require('moon-component-compiler/dev/injectStyle'); var removeStyle = injectStyle(${JSON.stringify(style)});\n`;
     }
   }
 
