@@ -43,7 +43,7 @@ const compile = (name, component, options) => {
     style = compileLanguage(style.children[0].content, style.attributes.lang);
 
     if(scoped === true) {
-      const scopeID = id(name);
+      const scopeID = `m-scope-${id(name)}`;
       style = style.replace(selectorRE, `$1.${scopeID}`);
       if(template !== undefined) {
         const parsedTemplateChildren = himalaya.parse(template.children[0].content);
