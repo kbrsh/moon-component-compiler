@@ -25,6 +25,7 @@ module.exports.init = function(Moon, name, options) {
 }
 
 module.exports.reload = function(name, options, render) {
+  var Moon = window.MOON_HOT_RELOAD;
   var item = map[name];
   var instances = item.instances;
 
@@ -38,8 +39,6 @@ module.exports.reload = function(name, options, render) {
       instance.build();
     }
   } else {
-    var Moon = window.MOON_HOT_RELOAD;
-
     var oldCTor = item.CTor;
     var newCTor = Moon.component(name, options);
     var el = null;
