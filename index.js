@@ -25,16 +25,14 @@ const compile = (name, component, options) => {
   let script = undefined;
 
   for(let i = 0; i < tree.length; i++) {
-    let node = tree[i];
+    const node = tree[i];
 
     if(node.type === "Element") {
       const tagName = node.tagName;
       if(tagName === "template" && template === undefined) {
         template = node;
 
-        node = himalaya.parse(node.children[0].content);
-
-        const children = node.children;
+        const children = himalaya.parse(node.children[0].content);
         for(let i = 0; i < children.length; i++) {
           const child = children[i];
           if(child.type === "Element") {
@@ -56,7 +54,7 @@ const compile = (name, component, options) => {
 
     if(scoped === true) {
       const scopeID = `m-scope-${id(name)}`;
-      style = style.replace(selectorRE, `$1.${scopeID}`);
+      style = style.replace(selectorRE, `$1.${scopeID} `);
       if(template !== undefined) {
         addClass(templateRoot, scopeID);
       }
