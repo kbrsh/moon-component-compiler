@@ -53,7 +53,7 @@ const compile = (name, component, options) => {
     }
 
     if(development === true) {
-      output += `var injectStyle = require('moon-component-compiler/injectStyle'); injectStyle("${style.replace(newlineRE, "")}");\n`;
+      output += `var injectStyle = require('moon-component-compiler/injectStyle'); var removeStyle = injectStyle("${style.replace(newlineRE, "")}");\n`;
     }
   }
 
@@ -66,7 +66,11 @@ const compile = (name, component, options) => {
   }
 
   if(development === true) {
-    output += `var hotReload = require("moon-hot-reload"); if(module.hot) {module.hot.accept(); hotReload.reload("${name}");}; module.exports = function(Moon) {hotReload.init("${name}", Moon.component("${name}", options));};`;
+    output += `var hotReload = require("moon-hot-reload"); if(module.hot) {module.hot.accept(); `;
+    if(style !== undefined) {
+      output += `module.hot.dispose(removeStyle); `;
+    }
+    output += `hotReload.reload("${name}");}; module.exports = function(Moon) {hotReload.init("${name}", Moon.component("${name}", options));};`;
   } else {
     output += `module.exports = function(Moon) {Moon.component("${name}", options);};`;
   }
