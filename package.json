@@ -24,5 +24,8 @@
   "bugs": {
     "url": "https://github.com/KingPixil/moon-component-compiler/issues"
   },
-  "homepage": "https://github.com/KingPixil/moon-component-compiler#readme"
+  "homepage": "https://github.com/KingPixil/moon-component-compiler#readme",
+  "dependencies": {
+    "htmlparser": "^1.7.7"
+  }
 }
