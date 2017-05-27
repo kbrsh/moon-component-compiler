@@ -49,7 +49,8 @@ For example:
 
 ```js
 {
-  component: "var options = {};"
+  component: "",
+  style: ""
 }
 ```
 
