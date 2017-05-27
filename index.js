@@ -4,6 +4,7 @@ const toHTML = require("himalaya/translate").toHTML;
 const selectorRE = /([\#\.\w\-\,\s\n\r\t:]+?)\s*(?=\s*\{)/g;
 
 const id = require('./src/id.js');
+const addClass = require('./src/addClass.js');
 const compileLanguage = require('./src/compile.js');
 
 const compile = (name, component, options) => {
@@ -37,17 +38,23 @@ const compile = (name, component, options) => {
     output += `options = (function(exports) {${compileLanguage(script.children[0].content, script.attributes.lang)} return exports;})({});\n`;
   }
 
-  if(template !== undefined) {
-    output += `options.render = ${Moon.compile(compileLanguage(template.children[0].content, template.attributes.lang)).toString().replace("function anonymous(h\n/**/)", "function(h)")}\n`;
-  }
-
   if(style !== undefined) {
     const scoped = style.attributes.scoped === "scoped";
     style = compileLanguage(style.children[0].content, style.attributes.lang);
 
     if(scoped === true) {
-      style = style.replace(selectorRE, `$1.${id(name)}`);
+      const scopeID = id(name);
+      style = style.replace(selectorRE, `$1.${scopeID}`);
+      if(template !== undefined) {
+        const parsedTemplateChildren = himalaya.parse(template.children[0].content);
+        addClass(parsedTemplateChildren[0], scopeID);
+        template.children[0].content = toHTML(parsedTemplateChildren[0]);
+      }
     }
+  }
+
+  if(template !== undefined) {
+    output += `options.render = ${Moon.compile(compileLanguage(toHTML(template.children[0]), template.attributes.lang)).toString().replace("function anonymous(h\n/**/)", "function(h)")}\n`;
   }
 
   if(options.hotReload === true) {
