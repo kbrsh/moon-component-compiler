@@ -78,7 +78,7 @@ const compile = (name, component, options) => {
     if(style !== undefined) {
       output += `module.hot.dispose(removeStyle); `;
     }
-    output += `hotReload.reload("${name}", options);};\n`;
+    output += `if(module.hot.data) {hotReload.reload("${name}", options);};};\n`;
     output += `module.exports = function(Moon) {hotReload.init(Moon, "${name}", options);};`;
   } else {
     output += `module.exports = function(Moon) {Moon.component("${name}", options);};`;
