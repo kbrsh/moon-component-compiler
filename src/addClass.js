@@ -1,10 +1,10 @@
 module.exports = (node, name) => {
   if(node.type === "Element") {
     const attributes = node.attributes;
-    if(attributes.class === undefined) {
-      attributes.class = name;
+    if(attributes.className === undefined) {
+      attributes.className = [name];
     } else {
-      attributes.class += ` ${name}`;
+      attributes.className.push(name);
     }
 
     const children = node.children;
