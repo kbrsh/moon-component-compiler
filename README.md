@@ -10,8 +10,10 @@ For example:
 
 ```html
 <template>
-  <h1>Component!</h1>
-  <p>{{someProp}}</p>
+  <div>
+    <h1>Component!</h1>
+    <p>{{someProp}}</p>
+  </div>
 </template>
 
 <style lang="stylus" scoped>
