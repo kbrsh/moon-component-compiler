@@ -17,9 +17,8 @@ For example:
 </template>
 
 <style lang="stylus" scoped>
-h1 {
+h1
   color blue
-}
 </style>
 
 <script>
