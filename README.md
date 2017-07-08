@@ -10,14 +10,15 @@ For example:
 
 ```html
 <template>
-  <h1>Component!</h1>
-  <p>{{someProp}}</p>
+  <div>
+    <h1>Component!</h1>
+    <p>{{someProp}}</p>
+  </div>
 </template>
 
 <style lang="stylus" scoped>
-h1 {
+h1
   color blue
-}
 </style>
 
 <script>
@@ -31,7 +32,7 @@ As you can see, you can have scoped CSS, preprocessors, and organize your code!
 
 ### Compiling
 
-To compile a single file component (a `.moon file`), you can do:
+To compile a single file component (a `.moon`file), you can do:
 
 ```js
 const compile = require("moon-component-compiler");
