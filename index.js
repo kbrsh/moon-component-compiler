@@ -88,7 +88,7 @@ const compile = (name, component, options) => {
   }
 
   if(template !== undefined && templateRoot !== undefined) {
-    output += `options.render = ${Moon.compile(compileLanguage(toHTML(templateRoot), template.attributes.lang)).toString().replace("function anonymous(h\n/**/)", "function(h)")}\n`;
+    output += `options.render = ${Moon.compile(compileLanguage(toHTML(templateRoot), template.attributes.lang)).toString().replace("function anonymous(m\n/**/)", "function(m)")}\n`;
   }
 
   if(development === true) {
