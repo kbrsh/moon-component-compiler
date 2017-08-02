@@ -1,6 +1,6 @@
 {
   "name": "moon-component-compiler",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Compiler for Moon Single File Components",
   "main": "index.js",
   "scripts": {
