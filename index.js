@@ -72,7 +72,9 @@ const compile = (name, component, options) => {
 
     if(scoped === true) {
       const scopeID = `m-scope-${id(name)}`;
-      style = style.replace(selectorRE, `$1.${scopeID} `);
+      style = style.replace(selectorRE, function(match, selectors) {
+        return `${selectors.split(",").map((selector) => `${selector}.${scopeID}`).join(",")} `
+      });
       if(template !== undefined) {
         addClass(templateRoot, scopeID);
       }
