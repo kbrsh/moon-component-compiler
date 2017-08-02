@@ -12,9 +12,9 @@ module.exports = (node, name) => {
       const type = classNameLiteral.replace(whiteSpaceStartRE, "")[0];
 
       if(type === "[") {
-        className = `${classNameLiteral.substring(0, classNameLiteral.length - 1)}, "${name}"]`;
+        className = `${classNameLiteral.substring(0, classNameLiteral.length - 1)}, '${name}']`;
       } else if(type === "{") {
-        className = `${classNameLiteral.substring(0, classNameLiteral.length - 1)}, "${name}": true}`;
+        className = `${classNameLiteral.substring(0, classNameLiteral.length - 1)}, '${name}': true}`;
       }
 
       attributes["mLiteral:class"] = className;
