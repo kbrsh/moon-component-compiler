@@ -1,3 +1,10 @@
+/**
+ * Slash
+ * Fast, efficient hash
+ * Copyright 2017 Kabir Shah
+ * Released under the MIT License
+ */
+
 const max = 0xFFFFFFFF;
 
 const baseToInt = {
