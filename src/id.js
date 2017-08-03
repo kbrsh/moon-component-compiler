@@ -1,21 +1,6 @@
 const max = 0xFFFFFFFF;
 
-const pad = (str) => {
-	const length = str.length;
-  if(str.length === 32) {
-  	return str;
-  } else {
-  	const diff = 32 - length;
-  	let padded = "";
-    for(let i = 0; i < diff; i++) {
-    	padded += "0";
-    }
-    padded += str;
-    return padded;
-  }
-}
-
-let baseToInt = {
+const baseToInt = {
   '0': 0,
   '1': 1,
   '2': 2,
@@ -54,7 +39,7 @@ let baseToInt = {
   '35': 35
 }
 
-let intToBase = {
+const intToBase = {
   '0': 0,
   '1': 1,
   '2': 2,
@@ -91,32 +76,81 @@ let intToBase = {
   '33': 'X',
   '34': 'Y',
   '35': 'Z'
+}
+
+const pad = (str) => {
+	const length = str.length;
+  if(str.length === 32) {
+  	return str;
+  } else {
+  	const diff = 32 - length;
+  	let padded = "";
+    for(let i = 0; i < diff; i++) {
+    	padded += "0";
+    }
+    padded += str;
+    return padded;
   }
+}
+
+const padRight = (str, amount) => {
+	for(let i = 0; i < amount; i++) {
+		str += "0";
+	}
+
+	return str;
+}
+
+const wrap = (str) => {
+	let result = 0;
+
+	for(let i = 0; i < str.length; i++) {
+		result = ((result * 2) + (baseToInt[str[i]])) % max;
+	}
+
+	return result;
+}
 
 function Long(high, low) {
-  if(high > max) {
-    high = max;
-  }
-
-  if(low > max) {
-    low = max;
-  }
-
   this.high = high;
   this.low = low;
+
+	this.__long__ = true;
 
   return this;
 }
 
 Long.prototype.xor = function(value) {
-  return new Long(this.high ^ value.high, this.low ^ value.low);
+	if(value.__long__ === undefined) {
+		value = new Long(0, value);
+	}
+
+  return new Long((this.high ^ value.high) >>> 0, (this.low ^ value.low) >>> 0);
 }
 
 Long.prototype.shiftLeft = function(value) {
-  if(value < 32) {
-    return new Long((this.high << value) | (this.low >>> (32 - value)), this.low << value);
+	if(value < 32) {
+		let shiftedHigh = (this.high << value) >>> 0;
+		let shiftedLow = (this.low << value) >>> 0;
+
+		if(shiftedHigh < 0) {
+			shiftedHigh = wrap(padRight(this.high.toString(2), value));
+		}
+
+		if(shiftedLow < 0) {
+			shiftedLow = wrap(padRight(this.low.toString(2), value));
+		}
+
+    return new Long((shiftedHigh) | (this.low >>> (32 - value)), shiftedLow);
   } else {
-    return new Long(this.low << (value - 32), 0);
+		let shiftBy = value - 32;
+		let shiftedLow = (this.low << shiftBy) >>> 0;
+
+		if(shiftedLow < 0) {
+			shiftedLow = wrap(padRight(this.low.toString(2), shiftBy));
+		}
+
+    return new Long(shiftedLow, 0);
   }
 }
 
@@ -166,5 +200,5 @@ module.exports = (name) => {
     result = result.xor(result.shiftLeft(2).xor(result.shiftLeft(4).xor(result.shiftLeft(5).xor(result.shiftLeft(9).xor(result.shiftLeft(16).xor(result.shiftLeft(17).xor(result.shiftLeft(20).xor(result.shiftLeft(24).xor(result.shiftLeft(26).xor(result.shiftLeft(28).xor(result.shiftLeft(32).xor(result.shiftLeft(33).xor(result.shiftLeft(41).xor(result.shiftLeft(44).xor(result.shiftLeft(45).xor(result.shiftLeft(46).xor(result.shiftLeft(48).xor(result.shiftLeft(53).xor(result.shiftLeft(55)))))))))))))))))))).xor(bytes[i]);
   }
 
-  return result.toString(36);
+  return result.toString(36).toLowerCase();
 }
