@@ -1,9 +1,170 @@
+const max = 0xFFFFFFFF;
+
+const pad = (str) => {
+	const length = str.length;
+  if(str.length === 32) {
+  	return str;
+  } else {
+  	const diff = 32 - length;
+  	let padded = "";
+    for(let i = 0; i < diff; i++) {
+    	padded += "0";
+    }
+    padded += str;
+    return padded;
+  }
+}
+
+let baseToInt = {
+  '0': 0,
+  '1': 1,
+  '2': 2,
+  '3': 3,
+  '4': 4,
+  '5': 5,
+  '6': 6,
+  '7': 7,
+  '8': 8,
+  '9': 9,
+  '10': 10,
+  '11': 11,
+  '12': 12,
+  '13': 13,
+  '14': 14,
+  '15': 15,
+  '16': 16,
+  '17': 17,
+  '18': 18,
+  '19': 19,
+  '20': 20,
+  '21': 21,
+  '22': 22,
+  '23': 23,
+  '24': 24,
+  '25': 25,
+  '26': 26,
+  '27': 27,
+  '28': 28,
+  '29': 29,
+  '30': 30,
+  '31': 31,
+  '32': 32,
+  '33': 33,
+  '34': 34,
+  '35': 35
+}
+
+let intToBase = {
+  '0': 0,
+  '1': 1,
+  '2': 2,
+  '3': 3,
+  '4': 4,
+  '5': 5,
+  '6': 6,
+  '7': 7,
+  '8': 8,
+  '9': 9,
+  '10': 'A',
+  '11': 'B',
+  '12': 'C',
+  '13': 'D',
+  '14': 'E',
+  '15': 'F',
+  '16': 'G',
+  '17': 'H',
+  '18': 'I',
+  '19': 'J',
+  '20': 'K',
+  '21': 'L',
+  '22': 'M',
+  '23': 'N',
+  '24': 'O',
+  '25': 'P',
+  '26': 'Q',
+  '27': 'R',
+  '28': 'S',
+  '29': 'T',
+  '30': 'U',
+  '31': 'V',
+  '32': 'W',
+  '33': 'X',
+  '34': 'Y',
+  '35': 'Z'
+  }
+
+function Long(high, low) {
+  if(high > max) {
+    high = max;
+  }
+
+  if(low > max) {
+    low = max;
+  }
+
+  this.high = high;
+  this.low = low;
+
+  return this;
+}
+
+Long.prototype.xor = function(value) {
+  return new Long(this.high ^ value.high, this.low ^ value.low);
+}
+
+Long.prototype.shiftLeft = function(value) {
+  if(value < 32) {
+    return new Long((this.high << value) | (this.low >>> (32 - value)), this.low << value);
+  } else {
+    return new Long(this.low << (value - 32), 0);
+  }
+}
+
+Long.prototype.toString = function(radix) {
+  if(radix === undefined) {
+  	radix = 10;
+  }
+
+  let binary = pad(this.high.toString(2)) + pad(this.low.toString(2));
+  let result = "";
+  let i = 0;
+  let bit = 0;
+  let end = [];
+  let calc = 0;
+  let quotient = 0;
+  let remainder = 0;
+
+  while(binary.length !== 0) {
+  	remainder = 0;
+  	end = [];
+  	for(i = 0; i < binary.length; i++) {
+    	bit = baseToInt[binary[i]];
+      calc = bit + (remainder * 2);
+    	quotient = (calc / radix) | 0;
+      remainder = calc % radix;
+      if((end.length !== 0) || (quotient !== 0)) {
+      	end.push(quotient);
+      }
+    }
+    binary = end;
+    result = intToBase[remainder] + result;
+  }
+
+  return result;
+}
+
 module.exports = (name) => {
-  name = name.split('').map((char) => {
-    return char.charCodeAt(0);
-  });
-  name = name.reduce(function(prev, curr){
-    return ((prev << 5) + prev) + curr;
-  }, 5381);
-  return name.toString(36);
+  let result = new Long(0, 1);
+  let i = 0;
+  let bytes = [];
+
+  for(; i < name.length; i++) {
+    bytes[i] = name.charCodeAt(i);
+  }
+
+  for(i = 0; i < bytes.length; i++) {
+    result = result.xor(result.shiftLeft(2).xor(result.shiftLeft(4).xor(result.shiftLeft(5).xor(result.shiftLeft(9).xor(result.shiftLeft(16).xor(result.shiftLeft(17).xor(result.shiftLeft(20).xor(result.shiftLeft(24).xor(result.shiftLeft(26).xor(result.shiftLeft(28).xor(result.shiftLeft(32).xor(result.shiftLeft(33).xor(result.shiftLeft(41).xor(result.shiftLeft(44).xor(result.shiftLeft(45).xor(result.shiftLeft(46).xor(result.shiftLeft(48).xor(result.shiftLeft(53).xor(result.shiftLeft(55)))))))))))))))))))).xor(bytes[i]);
+  }
+
+  return result.toString(36);
 }
