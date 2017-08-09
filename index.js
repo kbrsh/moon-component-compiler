@@ -71,7 +71,7 @@ const compile = (name, component, options) => {
     style = styleRoot;
 
     if(scoped === true) {
-      const scopeID = `m-scope-${id(name)}`;
+      const scopeID = `m-scope-${id(name).toLowerCase()}`;
       style = style.replace(selectorRE, function(match, selectors) {
         return `${selectors.split(",").map((selector) => `${selector}.${scopeID}`).join(",")} `
       });
