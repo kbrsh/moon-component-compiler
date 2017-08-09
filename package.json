@@ -3,12 +3,9 @@
   "version": "0.1.3",
   "description": "Compiler for Moon Single File Components",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/KingPixil/moon-component-compiler.git"
+    "url": "git+https://github.com/kbrsh/moon-component-compiler.git"
   },
   "keywords": [
     "compiler",
@@ -22,9 +19,9 @@
   "author": "Kabir Shah",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/KingPixil/moon-component-compiler/issues"
+    "url": "https://github.com/kbrsh/moon-component-compiler/issues"
   },
-  "homepage": "https://github.com/KingPixil/moon-component-compiler#readme",
+  "homepage": "https://github.com/kbrsh/moon-component-compiler#readme",
   "dependencies": {
     "himalaya": "^0.2.8"
   }
