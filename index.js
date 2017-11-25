@@ -86,7 +86,7 @@ const compile = (name, component, options) => {
   }
 
   if(script !== undefined) {
-    output += `options = (function(options) {${scriptRoot} return options;})({});\n`;
+    output += `options = (function() {${scriptRoot.replace("export default", "return")}})();\n`;
   }
 
   if(template !== undefined && templateRoot !== undefined) {
