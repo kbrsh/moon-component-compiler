@@ -2,9 +2,9 @@ const Moon = require("moonjs");
 const himalaya = require("himalaya");
 const toHTML = require("himalaya/translate").toHTML;
 
-const id = require('./src/id.js');
-const addClass = require('./src/addClass.js');
-const compileLanguage = require('./src/compile.js');
+const id = require("./src/id.js");
+const addClass = require("./src/addClass.js");
+const compileLanguage = require("./src/compile.js");
 
 const selectorRE = /([\#\.\w\-\,\s\n\r\t:]+?)\s*(?=\s*\{)/g;
 
@@ -81,12 +81,12 @@ const compile = (name, component, options) => {
     }
 
     if(development === true) {
-      output += `var injectStyle = require('moon-component-compiler/dev/injectStyle'); var removeStyle = injectStyle(${JSON.stringify(style)});\n`;
+      output += `var injectStyle = require("moon-component-compiler/dev/injectStyle"); var removeStyle = injectStyle(${JSON.stringify(style)});\n`;
     }
   }
 
   if(script !== undefined) {
-    output += `options = (function(exports) {${scriptRoot} return exports;})({});\n`;
+    output += `options = (function(options) {${scriptRoot} return options;})({});\n`;
   }
 
   if(template !== undefined && templateRoot !== undefined) {
@@ -101,7 +101,7 @@ const compile = (name, component, options) => {
     output += `if(module.hot.data) {hotReload.reload("${name}", options, ${render});};};\n`;
     output += `module.exports = function(Moon) {hotReload.init(Moon, "${name}", options);};`;
   } else {
-    output += `module.exports = function(Moon) {Moon.component("${name}", options);};`;
+    output += `module.exports = function(Moon) {Moon.extend("${name}", options);};`;
   }
 
   return {
